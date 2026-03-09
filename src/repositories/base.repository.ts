@@ -24,7 +24,7 @@ export abstract class BaseRepository<T, TModel extends Document> {
     async getAll(
         filters: Record<string, unknown> = {},
         pagination: { skip: number; limit: number } = { skip: 0, limit: 0 }
-    ) {
+    ): Promise<T[]> {
         logger.debug(`Repository: Finding ${this.entityName} with filters: ${JSON.stringify(filters)} and pagination: ${JSON.stringify(pagination)}`);
         const docs = await this.model.find(filters, {}, pagination);
         logger.debug(`Repository: Found ${docs.length} ${this.entityName}`);
