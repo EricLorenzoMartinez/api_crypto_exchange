@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { IAsset } from '../interfaces/asset.interface';
 
+export interface IAssetModel extends Omit<IAsset, 'id'>, mongoose.Document {}
+
 const assetSchema = new mongoose.Schema(
     {
         symbol: { type: String, required: true },
@@ -12,4 +14,4 @@ const assetSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-export const AssetModel = mongoose.model<IAsset>('Asset', assetSchema);
+export const AssetModel = mongoose.model<IAssetModel>('Asset', assetSchema);

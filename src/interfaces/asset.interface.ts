@@ -1,6 +1,5 @@
-import { Document } from 'mongoose';
-
-export interface IAsset extends Document {
+export interface IAsset {
+    id: string;
     symbol: string;
     name: string;
     coincapId: string;
