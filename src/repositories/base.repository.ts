@@ -46,4 +46,18 @@ export abstract class BaseRepository<T, TModel extends Document> {
         logger.debug(`Repository: Found ${this.entityName} with id: ${id}`);
         return this.transformId(doc);
     }
+
+    async create(data: Partial<TModel>): Promise<T> | null {
+        logger.debug(
+            `Repository: Creating ${this.entityName} with data: ${JSON.stringify(
+                data
+            )}`
+        );
+        const doc = await this.model.create(data as any);
+        if (!doc) {
+            logger.debug(`Repository: Failed to create ${this.entityName}`);
+            return null;
+        }
+        logger.debug(`Repository: Created ${this.entityName} with id: ${doc._id}`);
+        return this.transformId(doc as any as TModel);
 }
