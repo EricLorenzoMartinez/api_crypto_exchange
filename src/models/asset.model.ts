@@ -8,7 +8,8 @@ const assetSchema = new mongoose.Schema(
         coincapId: { type: String, required: true, unique: true },
         lastPriceUsd: { type: Number, required: false },
         lastPriceAt: { type: Date, required: false },
-    }
+    },
+    { timestamps: true }
 );
 
 export const AssetModel = mongoose.model<IAsset>('Asset', assetSchema);
