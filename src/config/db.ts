@@ -1,19 +1,35 @@
-import mongoose from 'mongoose';
+import mongoose, { type ConnectOptions } from 'mongoose';
+import { logError } from '../utils/logger.helper';
+import { DATABASE_URL } from './config';
+import logger from './logger';
 
-const connectDB = async (): Promise<void> => {
+export const connectDB = async () => {
     try {
-        const mongoUrl = process.env.MONGODB_URL;
+        const options: ConnectOptions = {};
 
-        if (!mongoUrl) {
-            throw new Error('Environment var MONGODB_URL is not defined');
+        if (!DATABASE_URL) {
+            throw new Error('Environment var DATABASE_URL is not defined');
         }
 
-        await mongoose.connect(mongoUrl);
-        console.log('Connected to MongoDB');
+        logger.info('Connecting to the database...');
+        await mongoose.connect(DATABASE_URL, options);
+        logger.info('Connected to the database successfully');
+
+        mongoose.connection.on('error', (error: unknown) => {
+            logError(error, 'Connection was interrupted');
+            process.exit(1);
+        });
     } catch (error: unknown) {
-        console.error('Error connecting to MongoDB:', error);
+        logError(error, 'Error connecting to the database');
         process.exit(1);
     }
-}
+};
 
-export default connectDB;
+export const closeDB = async () => {
+    try {
+        await mongoose.connection.close();
+        logger.info('Database connection closed successfully');
+    } catch (error: unknown) {
+        logError(error, 'Error closing the database connection');
+    }
+};
