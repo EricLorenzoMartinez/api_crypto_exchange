@@ -46,4 +46,15 @@ export abstract class BaseRepository<T, TModel extends Document> {
         logger.debug(`Repository: Found ${docs.length} ${this.entityName}`);
         return docs.map((doc) => this.transformId(doc));
     }
+
+    async getById(id: string): Promise<T | null> {
+        logger.debug(`Repository: Finding ${this.entityName} by id: ${id}`);
+        const doc = await this.model.findById(id);
+        if (!doc) {
+            logger.debug(`Repository: No ${this.entityName} found with id: ${id}`);
+            return null;
+        }
+        logger.debug(`Repository: Found ${this.entityName} with id: ${id}`);
+        return this.transformId(doc);
+    }
 }
