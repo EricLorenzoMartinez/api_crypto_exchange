@@ -25,11 +25,7 @@ export abstract class BaseRepository<T, TModel extends Document> {
         filters: Record<string, unknown> = {},
         pagination: { skip: number; limit: number } = { skip: 0, limit: 0 }
     ) {
-        logger.debug(
-            `Repository: Finding ${this.entityName} with filters: ${JSON.stringify(
-                filters
-            )} and pagination: ${JSON.stringify(pagination)}`
-        );
+        logger.debug(`Repository: Finding ${this.entityName} with filters: ${JSON.stringify(filters)} and pagination: ${JSON.stringify(pagination)}`);
         const docs = await this.model.find(filters, {}, pagination);
         logger.debug(`Repository: Found ${docs.length} ${this.entityName}`);
         return docs.map((doc) => this.transformId(doc));
@@ -47,12 +43,8 @@ export abstract class BaseRepository<T, TModel extends Document> {
         return this.transformId(doc);
     }
 
-    async create(data: Partial<TModel>): Promise<T> | null {
-        logger.debug(
-            `Repository: Creating ${this.entityName} with data: ${JSON.stringify(
-                data
-            )}`
-        );
+    async create(data: Partial<TModel>): Promise<T | null> {
+        logger.debug(`Repository: Creating ${this.entityName} with data: ${JSON.stringify(data)}`);
         const doc = await this.model.create(data as any);
         if (!doc) {
             logger.debug(`Repository: Failed to create ${this.entityName}`);
@@ -60,4 +52,16 @@ export abstract class BaseRepository<T, TModel extends Document> {
         }
         logger.debug(`Repository: Created ${this.entityName} with id: ${doc._id}`);
         return this.transformId(doc as any as TModel);
+    }
+
+    async update(id: string, data: Partial<TModel>): Promise<T | null> {
+        logger.debug(`Repository: Updating ${this.entityName} with id: ${id} and data: ${JSON.stringify(data)}`);
+        const doc = await this.model.findByIdAndUpdate(id, data, { new: true });
+        if (!doc) {
+            logger.debug(`Repository: No ${this.entityName} found with id: ${id}`);
+            return null;
+        }
+        logger.debug(`Repository: Updated ${this.entityName} with id: ${id}`);
+        return this.transformId(doc);
+    }
 }
