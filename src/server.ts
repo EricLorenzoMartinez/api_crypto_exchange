@@ -6,7 +6,6 @@ import { connectDB } from './config/db';
 const startServer = async () => {
     try {
         await connectDB();
-        logger.info('Database connected successfully');
 
         app.listen(PORT, () => {
             logger.info(`Server running at http://localhost:${PORT}`);
