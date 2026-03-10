@@ -21,8 +21,7 @@ assetRouter.post(
 );
 
 assetRouter.patch(
-  '/:id',
+  '/:id/refresh-last-price',
   validate(assetIdSchema, ValidationSource.PARAMS),
-  validate(createAssetSchema, ValidationSource.BODY),
   assetController.refreshLastAssetPrice
 );

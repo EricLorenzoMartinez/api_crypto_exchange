@@ -9,12 +9,12 @@ export enum ValidationSource {
   PARAMS = 'params',
 }
 
-export const validate = <ReqParams, ReqBody, ReqQuery>(
+export const validate = (
   schema: Joi.ObjectSchema,
   source: ValidationSource
-): RequestHandler<ReqParams, never, ReqBody, ReqQuery> => {
+): RequestHandler => {
   return (
-    req: Request<ReqParams, never, ReqBody, ReqQuery>,
+    req: Request,
     res: Response,
     next: NextFunction
   ): void => {
@@ -23,7 +23,7 @@ export const validate = <ReqParams, ReqBody, ReqQuery>(
       `Validation middleware: Validating request ${source}`
     );
 
-    const objToValidate: ReqParams | ReqBody | ReqQuery = req[source];
+    const objToValidate = req[source as keyof Request];
     if (!objToValidate) {
       logger.warn(`Validation middleware: No data found in request ${source}`);
       next(new Error('Validation type not supported'));
