@@ -58,4 +58,8 @@ export class TransactionService {
         logger.info(`Service: Created transaction for user ${userId} on asset ${asset.coincapId} with quantity ${data.quantity} at price ${price}`);
         return createdTransaction;
     }
+
+    async updateTransaction(userId: string, transactionId: string, data: ITransactionUpdate): Promise<ITransaction> {
+        
+    }
 }
