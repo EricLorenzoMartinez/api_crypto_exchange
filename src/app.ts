@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { CLIENT_URL, NODE_ENV } from './config/config';
 import { baseRouter } from './routes/base.routes';
+import { errorMiddleware } from './middlewares/error.middleware';
 
 
 export const app = express();
@@ -18,3 +19,5 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api', baseRouter);
+
+app.use(errorMiddleware);
