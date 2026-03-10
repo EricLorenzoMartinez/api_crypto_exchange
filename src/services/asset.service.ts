@@ -3,12 +3,15 @@ import { IAsset, IAssetCreate } from '../interfaces/asset.interface';
 import logger from '../config/logger';
 import { AppError } from '../utils/application.error';
 import { httpStatus } from '../config/httpStatusCodes';
+import { CoinCapProvider } from '../providers/coincap.provider';
 
 export class AssetService {
     private readonly repository: AssetRepository;
+    private readonly coincapProvider: CoinCapProvider;
 
     constructor() {
         this.repository = new AssetRepository();
+        this.coincapProvider = new CoinCapProvider();
     }
 
     async getAllAssets(pagination: {
@@ -19,7 +22,7 @@ export class AssetService {
         return this.repository.getAll({}, pagination);
     }
 
-    async getAssetById(id: string): Promise<IAsset | null> {
+    async getAssetById(id: string): Promise<IAsset> {
         logger.debug(`Service: Getting asset by id: ${id}`);
         const asset = await this.repository.getById(id);
         if (!asset) {
@@ -42,5 +45,31 @@ export class AssetService {
         }
         logger.info(`Created asset with coincapId: ${createdAsset.coincapId}`);
         return createdAsset;
+    }
+
+    async refreshLastAssetPrice(id: string): Promise<IAsset> {
+        logger.debug(`Service: Refreshing last price for asset with id: ${id}`);
+        const asset = await this.getAssetById(id);
+        const currentPrice = await this.coincapProvider.getAssetPrice(asset.coincapId);
+
+        if (currentPrice === null) {
+            logger.error(`Service: Failed to fetch current price for asset with coincapId: ${asset.coincapId}`);
+            throw new AppError(`Could not fetch price from CoinCap for asset ${asset.symbol}`, httpStatus.SERVICE_UNAVAILABLE);
+        }
+
+        const updatedData = {
+            lastPriceUsd: currentPrice,
+            lastPriceAt: new Date(),
+        };
+
+        const updatedAsset = await this.repository.update(id, updatedData);
+        
+        if (!updatedAsset) {
+            logger.error(`Service: Failed to update asset with coincapId: ${asset.coincapId}`);
+            throw new AppError(`Failed to update asset`, httpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        logger.info(`Service: Successfully updated price for asset ${asset.coincapId} to ${currentPrice}`);
+        return updatedAsset;
     }
 }
