@@ -6,6 +6,7 @@ export interface AssetResponseDto {
     lastPriceUsd?: number;
     lastPriceAt?: Date;
 }
+
 export interface CreateAssetDto {
     symbol: string;
     name: string;
