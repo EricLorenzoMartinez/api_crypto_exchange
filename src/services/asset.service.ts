@@ -14,10 +14,7 @@ export class AssetService {
         this.coincapProvider = new CoinCapProvider();
     }
 
-    async getAllAssets(pagination: {
-        skip: number;
-        limit: number;
-    }): Promise<IAsset[]> {
+    async getAllAssets(pagination: { skip: number;limit: number; }): Promise<IAsset[]> {
         logger.debug(`Service: Getting all assets with pagination: ${JSON.stringify(pagination)}`);
         return this.repository.getAll({}, pagination);
     }

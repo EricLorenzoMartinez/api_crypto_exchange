@@ -17,6 +17,11 @@ export class TransactionService {
         this.coinCapProvider = new CoinCapProvider();
     }
 
+    async getAllTransactions(userId: string, pagination: { skip: number; limit: number }) {
+        logger.debug(`Service: Getting all transactions for user ${userId} with pagination: ${JSON.stringify(pagination)}`);
+        return this.transactionRepo.getAll({ userId }, pagination);
+    }
+
     async createTransaction(userId: string, data: CreateTransactionDto) {
         const asset = await this.assetService.getAssetById(data.assetId);
         const price = await this.coinCapProvider.getAssetPrice(asset.coincapId);
