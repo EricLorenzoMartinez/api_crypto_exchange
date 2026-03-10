@@ -8,3 +8,8 @@ export interface ITransaction {
     executedAt?: Date;
     notes?: string;
 }
+
+type SystemKeys = 'id' | 'userId' | 'priceUsdAtExecution' | 'executedAt';
+type EditableFilm = Omit<ITransaction, SystemKeys>;
+
+export type ITransactionCreate = EditableFilm;
