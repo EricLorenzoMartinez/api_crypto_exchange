@@ -6,3 +6,8 @@ export interface IAsset {
     lastPriceUsd?: number;
     lastPriceAt?: Date;
 }
+
+type SystemKeys = 'id' | 'lastPriceUsd' | 'lastPriceAt';
+ type EditableFilm = Omit<IAsset, SystemKeys>;
+
+export type IAssetCreate = EditableFilm;
