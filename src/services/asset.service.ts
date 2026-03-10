@@ -29,9 +29,9 @@ export class AssetService {
         return asset;
     }
 
-    async createAsset(data: Partial<IAssetCreate>): Promise<IAsset> {
-        const existingAsset = await this.repository.getAll({ coincapId: data.coincapId });
-        if (existingAsset.length > 0) {
+    async createAsset(data: IAssetCreate): Promise<IAsset> {
+        const existingAsset = await this.repository.getAssetByCoinCapId(data.coincapId);
+        if (existingAsset) {
             logger.warn(`Asset with coincapId ${data.coincapId} already exists`);
             throw new AppError(`Asset already exists`, httpStatus.CONFLICT, { coincapId: data.coincapId });
         }
