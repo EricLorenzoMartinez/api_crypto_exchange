@@ -45,10 +45,6 @@ export class AssetController {
         logger.debug(`Controller: Received request to get asset by ID: ${assetId}`);
         try {
             const asset = await this.assetService.getAssetById(assetId);
-            if (!asset) {
-                res.status(httpStatus.NOT_FOUND).send({ error: 'Asset not found' });
-                return;
-            }
             const data = toAssetResponse(asset);
 
             const response = {
@@ -61,6 +57,29 @@ export class AssetController {
             logger.debug(`Controller: Error fetching asset by id: ${assetId}`);
             if (!(appError instanceof AppError)) {
                 appError = new AppError('Error occurred while retrieving asset', httpStatus.INTERNAL_SERVER_ERROR, {id: req.params.id, originalError: appError});
+            }
+            next(appError);
+        }
+    }
+
+    async createAsset(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const body = req.body as CreateAssetDto;
+        logger.debug(`Controller: Received request to create asset with body: ${JSON.stringify(body)}`);
+        try {
+            const assetToCreate = toCreateAssetInput(body);
+            const asset = await this.assetService.createAsset(assetToCreate);
+            const data = toAssetResponse(asset);
+            const response = {
+                message: 'Asset created successfully',
+                data,
+            };
+            res.status(httpStatus.CREATED).send(response);
+
+        } catch (error) {
+            let appError = error as unknown;
+            logger.debug(`Controller: Error creating asset`);
+            if (!(appError instanceof AppError)) {
+                appError = new AppError('Error occurred while creating asset', httpStatus.INTERNAL_SERVER_ERROR, {body: req.body, originalError: appError});
             }
             next(appError);
         }
