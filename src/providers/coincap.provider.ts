@@ -1,15 +1,21 @@
-import { COINCAP_API_URL } from '../config/config';
+import { COINCAP_API_URL, COINCAP_API_KEY } from '../config/config';
 import logger from '../config/logger';
 import { AppError } from '../utils/application.error';
 import { httpStatus } from '../config/httpStatusCodes';
 
 export class CoinCapProvider {
-    private readonly apiUrl: string = COINCAP_API_URL;
-
     async getAssetPrice(coincapId: string): Promise<number | null> {
+        const targetUrl = `${COINCAP_API_URL}/assets/${coincapId}`;
+        logger.debug(`CoinCapProvider: Fetching price for asset with coincapId: ${coincapId}`);
+
         try {
-            logger.debug(`CoinCapProvider: Fetching price for asset with coincapId: ${coincapId}`);
-            const response = await fetch(`${this.apiUrl}/assets/${coincapId}`);
+            const response = await fetch(targetUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${COINCAP_API_KEY}`
+                }
+            });
 
             if (!response.ok) {
                 logger.error(`CoinCapProvider: Failed to fetch price for asset with coincapId: ${coincapId}. Status: ${response.status}`);

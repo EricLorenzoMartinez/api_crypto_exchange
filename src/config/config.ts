@@ -9,5 +9,6 @@ export const {
   DATABASE_URL,
   CLIENT_URL,
   NODE_ENV = 'development',
-  COINCAP_API_URL = 'https://api.coincap.io/v2',
+  COINCAP_API_URL = 'https://rest.coincap.io/v3',
+  COINCAP_API_KEY,
 } = process.env;
