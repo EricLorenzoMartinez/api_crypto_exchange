@@ -5,7 +5,6 @@ import { AssetService } from '../services/asset.service';
 import { toAssetResponse, toCreateAssetInput } from '../mappers/asset.mapper';
 import { CreateAssetDto } from '../dtos/asset.dto';
 import { AppError } from '../utils/application.error';
-import { app } from '../app';
 
 export class AssetController {
     private assetService: AssetService;
@@ -14,7 +13,7 @@ export class AssetController {
         this.assetService = new AssetService();
     }
 
-    async getAllAssets(req: Request, res: Response, next: NextFunction): Promise<void> {
+    getAllAssets = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         logger.debug(`Controller: Received request to get all assets with query: ${JSON.stringify(req.query)}`);
         try {
             const { skip = 0, limit = 0 } = req.query;
@@ -38,9 +37,9 @@ export class AssetController {
             }
             next(appError);
         }
-    }
+    };
 
-    async getAssetById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    getAssetById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const assetId = req.params.id;
         logger.debug(`Controller: Received request to get asset by ID: ${assetId}`);
         try {
@@ -60,9 +59,9 @@ export class AssetController {
             }
             next(appError);
         }
-    }
+    };
 
-    async createAsset(req: Request, res: Response, next: NextFunction): Promise<void> {
+    createAsset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const body = req.body as CreateAssetDto;
         logger.debug(`Controller: Received request to create asset with body: ${JSON.stringify(body)}`);
         try {
@@ -83,5 +82,26 @@ export class AssetController {
             }
             next(appError);
         }
-    }
+    };
+
+    refreshLastAssetPrice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const assetId = req.params.id;
+        logger.debug(`Controller: Received request to refresh last price for asset with ID: ${assetId}`);
+        try {
+            const updatedAsset = await this.assetService.refreshLastAssetPrice(assetId);
+            const data = toAssetResponse(updatedAsset);
+            const response = {
+                message: 'Asset price refreshed successfully',
+                data,
+            };
+            res.send(response);
+        } catch (error) {
+            let appError = error as unknown;
+            logger.debug(`Controller: Error refreshing last price for asset with id: ${assetId}`);
+            if (!(appError instanceof AppError)) {
+                appError = new AppError('Error occurred while refreshing asset price', httpStatus.INTERNAL_SERVER_ERROR, {id: req.params.id, originalError: appError});
+            }
+            next(appError);
+        }
+    };
 }
