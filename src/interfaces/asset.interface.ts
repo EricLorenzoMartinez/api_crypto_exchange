@@ -8,6 +8,5 @@ export interface IAsset {
 }
 
 type SystemKeys = 'id' | 'lastPriceUsd' | 'lastPriceAt';
- type EditableFilm = Omit<IAsset, SystemKeys>;
 
-export type IAssetCreate = EditableFilm;
+export type IAssetCreate = Omit<IAsset, SystemKeys>;

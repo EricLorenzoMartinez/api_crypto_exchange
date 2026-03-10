@@ -32,7 +32,7 @@ export class TransactionService {
         return transaction;
     }
 
-    async createTransaction(userId: string, data: Partial<ITransactionCreate>): Promise<ITransaction> {
+    async createTransaction(userId: string, data: ITransactionCreate): Promise<ITransaction> {
         const asset = await this.assetService.getAssetById(data.assetId);
         const price = await this.coinCapProvider.getAssetPrice(asset.coincapId);
         

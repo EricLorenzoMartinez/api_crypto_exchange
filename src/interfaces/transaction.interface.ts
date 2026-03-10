@@ -9,7 +9,8 @@ export interface ITransaction {
     notes?: string;
 }
 
-type SystemKeys = 'id' | 'userId' | 'priceUsdAtExecution' | 'executedAt';
-type EditableFilm = Omit<ITransaction, SystemKeys>;
+type SystemKeys = 'id' | 'userId' | 'priceUsdAtExecution';
+type CreationKeys = 'assetId' | 'type' | 'quantity';
 
-export type ITransactionCreate = EditableFilm;
+export type ITransactionCreate = Omit<ITransaction, SystemKeys | 'executedAt'>;
+export type ITransactionUpdate = Omit<ITransaction, SystemKeys | CreationKeys>;
