@@ -1,5 +1,5 @@
 import { TransactionRepository } from '../repositories/transaction.repository';
-import { ITransaction, ITransactionCreate } from '../interfaces/transaction.interface';
+import { ITransaction, ITransactionCreate, ITransactionUpdate } from '../interfaces/transaction.interface';
 import logger from '../config/logger';
 import { AssetService } from './asset.service';
 import { CoinCapProvider } from '../providers/coincap.provider';
@@ -7,24 +7,24 @@ import { AppError } from '../utils/application.error';
 import { httpStatus } from '../config/httpStatusCodes';
 
 export class TransactionService {
-    private readonly transactionRepo: TransactionRepository;
+    private readonly transactionRepository: TransactionRepository;
     private readonly assetService: AssetService;
     private readonly coinCapProvider: CoinCapProvider;
 
     constructor() {
-        this.transactionRepo = new TransactionRepository();
+        this.transactionRepository = new TransactionRepository();
         this.assetService = new AssetService();
         this.coinCapProvider = new CoinCapProvider();
     }
 
-    async getAllTransactions(userId: string, pagination: { skip: number; limit: number }): Promise<ITransaction[]> {
+    async getUserTransactions(userId: string, pagination: { skip: number; limit: number }): Promise<ITransaction[]> {
         logger.debug(`Service: Getting all transactions for user ${userId} with pagination: ${JSON.stringify(pagination)}`);
-        return this.transactionRepo.getAll({ userId }, pagination);
+        return this.transactionRepository.getAll({ userId }, pagination);
     }
 
     async getTransactionById(userId: string, transactionId: string): Promise<ITransaction> {
         logger.debug(`Service: Getting transaction by ID ${transactionId} for user ${userId}`);
-        const transaction = await this.transactionRepo.getById(transactionId);
+        const transaction = await this.transactionRepository.getById(transactionId);
         if (!transaction || transaction.userId !== userId) {
             logger.warn(`Service: Transaction with ID ${transactionId} not found for user ${userId}`);
             throw new AppError('Transaction not found', httpStatus.NOT_FOUND);
@@ -50,7 +50,7 @@ export class TransactionService {
             priceUsdAtExecution: price
         };
 
-        const createdTransaction = await this.transactionRepo.create(transactionData);
+        const createdTransaction = await this.transactionRepository.create(transactionData);
         if (!createdTransaction) {
             logger.error(`Service: Failed to create transaction for user ${userId} with data: ${JSON.stringify(transactionData)}`);
             throw new AppError('Failed to create transaction', httpStatus.INTERNAL_SERVER_ERROR);
@@ -60,6 +60,18 @@ export class TransactionService {
     }
 
     async updateTransaction(userId: string, transactionId: string, data: ITransactionUpdate): Promise<ITransaction> {
-        
+        const transactionToUpdate = await this.transactionRepository.getById(transactionId);
+        if (!transactionToUpdate) {
+            logger.warn(`Service: Transaction with ID ${transactionId} not found for user ${userId}`);
+            throw new AppError('Transaction not found', httpStatus.NOT_FOUND);
+        }
+
+        const updatedTransaction = await this.transactionRepository.update(transactionId, data);
+        if (!updatedTransaction) {
+            logger.error(`Service: Failed to update transaction with ID ${transactionId} for user ${userId} with data: ${JSON.stringify(data)}`);
+            throw new AppError('Failed to update transaction', httpStatus.INTERNAL_SERVER_ERROR);
+        }
+        logger.info(`Service: Updated transaction with ID ${transactionId} for user ${userId} with data: ${JSON.stringify(data)}`);
+        return updatedTransaction;
     }
 }
