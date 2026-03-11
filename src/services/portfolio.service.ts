@@ -37,8 +37,8 @@ export class PortfolioService {
                         name: item.assetDetails.name,
                     },
                     netQuantity: item.netQuantity,
-                    currentPriceUsd: currentPriceUsd,
-                    currentValueUsd: item.netQuantity * currentPriceUsd
+                    currentPriceUsd: Number(currentPriceUsd.toFixed(2)),
+                    currentValueUsd: Number((item.netQuantity * currentPriceUsd).toFixed(2))
                 };
             })
         );
