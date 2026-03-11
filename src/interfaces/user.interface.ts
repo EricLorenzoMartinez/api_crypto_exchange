@@ -12,5 +12,3 @@ export interface IUser {
 type SystemKeys = 'id' | 'createdAt' | 'updatedAt';
 
 export type IUserCreate = Omit<IUser, SystemKeys>;
-
-export type IUserUpdate = Partial<Omit<IUser, SystemKeys>>;
