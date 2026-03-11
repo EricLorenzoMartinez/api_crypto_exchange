@@ -3,6 +3,7 @@ import { TransactionModel, ITransactionModel } from '../models/transaction.model
 import { BaseRepository } from './base.repository';
 import logger from '../config/logger';
 import mongoose from 'mongoose';
+import { IPortfolioAggregationRaw } from '../interfaces/portfolio.interface';
 
 
 export class TransactionRepository extends BaseRepository<ITransaction, ITransactionModel> {
@@ -23,7 +24,7 @@ export class TransactionRepository extends BaseRepository<ITransaction, ITransac
         return { id: _id.toString(), ...rest } as unknown as ITransactionPopulated;
     }
 
-    async getPortfolioByUserId(userId: string): Promise<any[]> {
+    async getPortfolioByUserId(userId: string): Promise<IPortfolioAggregationRaw[]> {
         logger.debug(`Repository: Calaculating portfolio aggregation for user: ${userId}`);
 
         const pipeline = [
