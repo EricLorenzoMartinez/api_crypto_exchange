@@ -2,6 +2,7 @@ import { ITransaction, ITransactionPopulated } from '../interfaces/transaction.i
 import { TransactionModel, ITransactionModel } from '../models/transaction.model';
 import { BaseRepository } from './base.repository';
 import logger from '../config/logger';
+import mongoose from 'mongoose';
 
 
 export class TransactionRepository extends BaseRepository<ITransaction, ITransactionModel> {
@@ -20,5 +21,43 @@ export class TransactionRepository extends BaseRepository<ITransaction, ITransac
         logger.debug(`Repository: Found Transaction with ID ${id} and populated asset`);
         const { _id, ...rest } = doc.toObject();
         return { id: _id.toString(), ...rest } as unknown as ITransactionPopulated;
+    }
+
+    async getPortfolioByUserId(userId: string): Promise<any[]> {
+        logger.debug(`Repository: Calaculating portfolio aggregation for user: ${userId}`);
+
+        const pipeline = [
+            {
+                $match: { userId: new mongoose.Types.ObjectId(userId) }
+            },
+            {
+                $group: {
+                    _id: "$assetId",
+                    netQuantity: {
+                        $sum: {
+                            $cond: [
+                                { $eq: ["$type", "BUY" ] },
+                                "$quantity",
+                                { $multiply: ["$quantity", -1] }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: "assets",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "assetDetails"
+                }
+            },
+            {
+                $unwind: "$assetDetails"
+            },
+        ];
+
+        const result = await this.model.aggregate(pipeline);
+        return result;
     }
 }
