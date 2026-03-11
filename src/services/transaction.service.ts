@@ -29,7 +29,7 @@ export class TransactionService {
             logger.warn(`Service: Transaction with ID ${transactionId} not found for user ${userId}`);
             throw new AppError('Transaction not found', httpStatus.NOT_FOUND);
         }
-        if (userId !== transaction.userId) {
+        if (userId !== transaction.userId.toString()) {
             logger.warn(`Service: User ${userId} is not authorized to access transaction with ID ${transactionId}`);
             throw new AppError('Unauthorized access to transaction', httpStatus.FORBIDDEN);
         }
@@ -70,7 +70,7 @@ export class TransactionService {
             logger.warn(`Service: Transaction with ID ${transactionId} not found for user ${userId}`);
             throw new AppError('Transaction not found', httpStatus.NOT_FOUND);
         }
-        if (userId !== transactionToUpdate.userId) {
+        if (userId !== transactionToUpdate.userId.toString()) {
             logger.warn(`Service: User ${userId} is not authorized to update transaction with ID ${transactionId}`);
             throw new AppError('Unauthorized access to transaction', httpStatus.FORBIDDEN);
         }
@@ -90,7 +90,7 @@ export class TransactionService {
             logger.warn(`Service: Transaction with ID ${transactionId} not found for user ${userId}`);
             throw new AppError('Transaction not found', httpStatus.NOT_FOUND);
         }
-        if (userId !== transactionToDelete.userId) {
+        if (userId !== transactionToDelete.userId.toString()) {
             logger.warn(`Service: User ${userId} is not authorized to delete transaction with ID ${transactionId}`);
             throw new AppError('Unauthorized access to transaction', httpStatus.FORBIDDEN);
         }
