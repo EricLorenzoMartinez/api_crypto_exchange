@@ -39,4 +39,27 @@ export class TransactionController {
             next(appError);
         }
     };
+
+    getTransactionById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const transactionId = req.params.id;
+        logger.debug(`Controller: Received request to get transaction by ID: ${transactionId}`);
+        try {
+            const userId = "<USER_ID>"; //TODO: Get from auth when done
+            const transaction = await this.transactionService.getTransactionById(userId, transactionId);
+            const data = toTransactionResponse(transaction);
+            
+            const response = {
+                message: 'Transaction retrieved successfully',
+                data,
+            };
+            res.send(response);
+        } catch (error) {
+            let appError = error as unknown;
+            logger.debug('Controller: Error fetching transaction');
+            if (!(appError instanceof AppError)) {
+                appError = new AppError('Error occurred while retrieving transaction', httpStatus.INTERNAL_SERVER_ERROR, {originalError: appError});
+            }
+            next(appError);
+        }
+    };
 }
