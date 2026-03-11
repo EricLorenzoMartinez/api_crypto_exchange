@@ -21,7 +21,7 @@ export class TransactionController {
                 skip: parseInt(skip as string, 10),
                 limit: parseInt(limit as string, 10),
             };
-            const userId = "507f1f77bcf86cd799439011"; //TODO: Get from auth when done
+            const userId = (req as any).user.id;
             const transactions = await this.transactionService.getUserTransactions(userId, pagination);
             const data = transactions.map(toTransactionResponse);
             const response = {
@@ -44,7 +44,7 @@ export class TransactionController {
         const transactionId = req.params.id;
         logger.debug(`Controller: Received request to get transaction by ID: ${transactionId}`);
         try {
-            const userId = "507f1f77bcf86cd799439011"; //TODO: Get from auth when done
+            const userId = (req as any).user.id;
             const transaction = await this.transactionService.getTransactionById(userId, transactionId);
             const data = toTransactionResponse(transaction);
             
@@ -67,7 +67,7 @@ export class TransactionController {
         const body = req.body as CreateTransactionDto;
         logger.debug(`Controller: Received request to create transaction with body: ${JSON.stringify(body)}`);
         try {
-            const userId = "507f1f77bcf86cd799439011"; //TODO: Get from auth when done
+            const userId = (req as any).user.id;
             const input = toCreateTransactionInput(body);
             const transaction = await this.transactionService.createTransaction(userId, input);
             const data = toTransactionResponse(transaction);
@@ -92,7 +92,7 @@ export class TransactionController {
         const body = req.body as UpdateTransactionDto;
         logger.debug(`Controller: Received request to update transaction with id: ${transactionId} and body: ${JSON.stringify(body)}`);
         try {
-            const userId = "507f1f77bcf86cd799439011"; //TODO: Get from auth when done
+            const userId = (req as any).user.id;
             const input = toUpdateTransactionInput(body);
             const transaction = await this.transactionService.updateTransaction(userId, transactionId, input);
             const data = toTransactionResponse(transaction);
@@ -116,7 +116,7 @@ export class TransactionController {
         const transactionId = req.params.id;
         logger.debug(`Controller: Received request to delete transaction with id: ${transactionId}`);
         try {
-            const userId = "507f1f77bcf86cd799439011"; //TODO: Get from auth when done
+            const userId = (req as any).user.id;
             await this.transactionService.deleteTransaction(userId, transactionId);
             
             const response = {

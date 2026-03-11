@@ -23,12 +23,7 @@ export const checkToken = (req: Request, res: Response, next: NextFunction): voi
   } catch (error) {
     if (error instanceof NotBeforeError) {
       logger.warn('checkToken middleware: Token is not active yet');
-      return next(
-        new AppError(
-          'Token not active yet. Please wait.',
-          httpStatus.UNAUTHORIZED
-        )
-      );
+      return next(new AppError('Token not active yet. Please wait.', httpStatus.UNAUTHORIZED));
     }
 
     if (error instanceof TokenExpiredError) {
