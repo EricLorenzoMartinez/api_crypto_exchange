@@ -111,4 +111,25 @@ export class TransactionController {
             next(appError);
         }
     };
+
+    deleteTransaction = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const transactionId = req.params.id;
+        logger.debug(`Controller: Received request to delete transaction with id: ${transactionId}`);
+        try {
+            const userId = "<USER_ID>"; //TODO: Get from auth when done
+            await this.transactionService.deleteTransaction(userId, transactionId);
+            
+            const response = {
+                message: 'Transaction deleted successfully',
+            };
+            res.send(response);
+        } catch (error) {
+            let appError = error as unknown;
+            logger.debug('Controller: Error deleting transaction');
+            if (!(appError instanceof AppError)) {
+                appError = new AppError('Error occurred while deleting transaction', httpStatus.INTERNAL_SERVER_ERROR, {originalError: appError});
+            }
+            next(appError);
+        }
+    };
 }
