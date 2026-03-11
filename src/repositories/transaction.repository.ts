@@ -1,4 +1,4 @@
-import { ITransaction } from '../interfaces/transaction.interface';
+import { ITransaction, ITransactionPopulated } from '../interfaces/transaction.interface';
 import { TransactionModel, ITransactionModel } from '../models/transaction.model';
 import { BaseRepository } from './base.repository';
 import logger from '../config/logger';
@@ -9,7 +9,7 @@ export class TransactionRepository extends BaseRepository<ITransaction, ITransac
         super(TransactionModel, 'Transaction');
     }
 
-    async getByIdWithAsset(id: string): Promise<ITransaction | null> {
+    async getByIdWithAsset(id: string): Promise<ITransactionPopulated | null> {
         logger.debug(`Repository: Finding Transaction by ID with populated asset: ${id}`);
         const doc = await this.model.findById(id).populate('assetId');
         if (!doc) {

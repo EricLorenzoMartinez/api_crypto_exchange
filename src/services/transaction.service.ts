@@ -1,5 +1,5 @@
 import { TransactionRepository } from '../repositories/transaction.repository';
-import { ITransaction, ITransactionCreate, ITransactionUpdate } from '../interfaces/transaction.interface';
+import { ITransaction, ITransactionPopulated, ITransactionCreate, ITransactionUpdate } from '../interfaces/transaction.interface';
 import logger from '../config/logger';
 import { AssetService } from './asset.service';
 import { CoinCapProvider } from '../providers/coincap.provider';
@@ -22,7 +22,7 @@ export class TransactionService {
         return this.transactionRepository.getAll({ userId }, pagination);
     }
 
-    async getTransactionById(userId: string, transactionId: string): Promise<ITransaction> {
+    async getTransactionById(userId: string, transactionId: string): Promise<ITransactionPopulated> {
         logger.debug(`Service: Getting transaction by ID ${transactionId} for user ${userId}`);
         const transaction = await this.transactionRepository.getByIdWithAsset(transactionId);
         if (!transaction) {

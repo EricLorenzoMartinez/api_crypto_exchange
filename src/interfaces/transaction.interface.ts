@@ -1,3 +1,5 @@
+import { IAsset } from './asset.interface';
+
 export interface ITransaction {
     id?: string;
     userId: string;
@@ -7,6 +9,10 @@ export interface ITransaction {
     priceUsdAtExecution: number;
     executedAt?: Date;
     notes?: string;
+}
+
+export interface ITransactionPopulated extends Omit<ITransaction, 'assetId'> {
+    assetId: IAsset;
 }
 
 type SystemKeys = 'id' | 'userId' | 'priceUsdAtExecution';
