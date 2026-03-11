@@ -4,6 +4,7 @@ export interface AuthResponseDto {
     name: string;
     email: string;
     birthday: string;
+    isBlocked: boolean;
     createdAt: string;
     updatedAt: string;
   };
