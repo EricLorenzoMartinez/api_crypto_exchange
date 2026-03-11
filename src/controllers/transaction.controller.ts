@@ -86,4 +86,29 @@ export class TransactionController {
             next(appError);
         }
     };
+
+    updateTransaction = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const transactionId = req.params.id;
+        const body = req.body as CreateTransactionDto;
+        logger.debug(`Controller: Received request to update transaction with id: ${transactionId} and body: ${JSON.stringify(body)}`);
+        try {
+            const userId = "<USER_ID>"; //TODO: Get from auth when done
+            const input = toUpdateTransactionInput(body);
+            const transaction = await this.transactionService.updateTransaction(userId, transactionId, input);
+            const data = toTransactionResponse(transaction);
+
+            const response = {
+                message: 'Transaction updated successfully',
+                data,
+            };
+            res.send(response);
+        } catch (error) {
+            let appError = error as unknown;
+            logger.debug('Controller: Error updating transaction');
+            if (!(appError instanceof AppError)) {
+                appError = new AppError('Error occurred while updating transaction', httpStatus.INTERNAL_SERVER_ERROR, {originalError: appError});
+            }
+            next(appError);
+        }
+    };
 }
