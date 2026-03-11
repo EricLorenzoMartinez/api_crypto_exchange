@@ -4,6 +4,7 @@ import logger from '../config/logger';
 import { TokenHelper } from '../utils/token.helper';
 import { AppError } from '../utils/application.error';
 import { NotBeforeError, TokenExpiredError } from 'jsonwebtoken';
+import { IAuthRequest } from '../interfaces/auth.interface';
 
 export const checkToken = (req: Request, res: Response, next: NextFunction): void => {
   logger.debug({ path: req.path, method: req.method }, 'checkToken middleware: Received authentication request');
@@ -17,7 +18,7 @@ export const checkToken = (req: Request, res: Response, next: NextFunction): voi
   try {
     const decoded = TokenHelper.verifyToken(token);
     logger.debug(decoded, `DECODED TOKEN: ${JSON.stringify(decoded)}`);
-    (req as any).user = decoded;
+    (req as IAuthRequest).user = decoded;
     logger.info('checkToken middleware: Token verified successfully');
     next();
   } catch (error) {

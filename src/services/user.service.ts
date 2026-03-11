@@ -39,8 +39,12 @@ export class UserService {
             throw new AppError('User must be at least 18 years old', httpStatus.BAD_REQUEST, { birthday: data.birthday });
         }
         
-        data.password = await PasswordHelper.hashPassword(data.password);
-        const createdUser = await this.userRepository.create(data);
+        const hashedPassword = await PasswordHelper.hashPassword(data.password);
+        const userToCreate = {
+            ...data,
+            password: hashedPassword,
+        };
+        const createdUser = await this.userRepository.create(userToCreate);
         
         if (!createdUser) {
             logger.warn('User creation failed');
