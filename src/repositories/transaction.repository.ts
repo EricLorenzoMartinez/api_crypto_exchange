@@ -19,6 +19,6 @@ export class TransactionRepository extends BaseRepository<ITransaction, ITransac
 
         logger.debug(`Repository: Found Transaction with ID ${id} and populated asset`);
         const { _id, ...rest } = doc.toObject();
-        return { id: _id.toString(), ...rest };
+        return { id: _id.toString(), ...rest } as unknown as ITransactionPopulated;
     }
 }

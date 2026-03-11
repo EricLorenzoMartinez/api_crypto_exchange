@@ -1,7 +1,9 @@
+import { IAsset } from "../interfaces/asset.interface";
+
 export interface TransactionResponseDto {
     id: string;
     userId: string;
-    assetId: string;
+    assetId: string | IAsset;
     type: 'BUY' | 'SELL';
     quantity: number;
     priceUsdAtExecution: number;
