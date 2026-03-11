@@ -24,11 +24,16 @@ export class TransactionService {
 
     async getTransactionById(userId: string, transactionId: string): Promise<ITransaction> {
         logger.debug(`Service: Getting transaction by ID ${transactionId} for user ${userId}`);
-        const transaction = await this.transactionRepository.getById(transactionId);
-        if (!transaction || transaction.userId !== userId) {
+        const transaction = await this.transactionRepository.getByIdWithAsset(transactionId);
+        if (!transaction) {
             logger.warn(`Service: Transaction with ID ${transactionId} not found for user ${userId}`);
             throw new AppError('Transaction not found', httpStatus.NOT_FOUND);
         }
+        if (userId !== transaction.userId) {
+            logger.warn(`Service: User ${userId} is not authorized to access transaction with ID ${transactionId}`);
+            throw new AppError('Unauthorized access to transaction', httpStatus.FORBIDDEN);
+        }
+        logger.debug(`Service: Found transaction with ID ${transactionId} for user ${userId}`);
         return transaction;
     }
 
@@ -65,6 +70,10 @@ export class TransactionService {
             logger.warn(`Service: Transaction with ID ${transactionId} not found for user ${userId}`);
             throw new AppError('Transaction not found', httpStatus.NOT_FOUND);
         }
+        if (userId !== transactionToUpdate.userId) {
+            logger.warn(`Service: User ${userId} is not authorized to update transaction with ID ${transactionId}`);
+            throw new AppError('Unauthorized access to transaction', httpStatus.FORBIDDEN);
+        }
 
         const updatedTransaction = await this.transactionRepository.update(transactionId, data);
         if (!updatedTransaction) {
@@ -73,5 +82,24 @@ export class TransactionService {
         }
         logger.info(`Service: Updated transaction with ID ${transactionId} for user ${userId} with data: ${JSON.stringify(data)}`);
         return updatedTransaction;
+    }
+
+    async deleteTransaction(userId: string, transactionId: string): Promise<void> {
+        const transactionToDelete = await this.transactionRepository.getById(transactionId);
+        if (!transactionToDelete) {
+            logger.warn(`Service: Transaction with ID ${transactionId} not found for user ${userId}`);
+            throw new AppError('Transaction not found', httpStatus.NOT_FOUND);
+        }
+        if (userId !== transactionToDelete.userId) {
+            logger.warn(`Service: User ${userId} is not authorized to delete transaction with ID ${transactionId}`);
+            throw new AppError('Unauthorized access to transaction', httpStatus.FORBIDDEN);
+        }
+        
+        const deletedTransaction = await this.transactionRepository.delete(transactionId);
+        if (!deletedTransaction) {
+            logger.error(`Service: Failed to delete transaction with ID ${transactionId} for user ${userId}`);
+            throw new AppError('Failed to delete transaction', httpStatus.INTERNAL_SERVER_ERROR);
+        }
+        logger.info(`Service: Deleted transaction with ID ${transactionId} for user ${userId}`);
     }
 }
