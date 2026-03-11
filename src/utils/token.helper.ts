@@ -10,7 +10,7 @@ export class TokenHelper {
 
     const options: jwt.SignOptions = {
       expiresIn: '2h',
-      notBefore: '10m',
+      // notBefore: '10m',
     };
     if (!SECRET_KEY) {
       logger.error('TokenHelper: SECRET_KEY is not defined');
