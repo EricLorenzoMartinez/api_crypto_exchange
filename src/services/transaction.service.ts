@@ -39,11 +39,20 @@ export class TransactionService {
 
     async createTransaction(userId: string, data: ITransactionCreate): Promise<ITransaction> {
         const asset = await this.assetService.getAssetById(data.assetId);
-        const price = await this.coinCapProvider.getAssetPrice(asset.coincapId);
+        let price = await this.coinCapProvider.getAssetPrice(asset.coincapId);
+        let currentPriceSource: 'COINCAP' | 'CACHE' = 'COINCAP';
         
         if (price === null) {
-            logger.error(`Service: Failed to fetch current price for asset with coincapId: ${asset.coincapId}`);
-            throw new AppError('Failed to retrieve asset price', httpStatus.SERVICE_UNAVAILABLE, { assetId: data.assetId });
+            logger.warn(`Service: CoinCap failed for ${asset.coincapId}. Attempting to use CACHE...`);
+
+            if (asset.lastPriceUsd) {
+                price = asset.lastPriceUsd;
+                currentPriceSource = 'CACHE';
+                logger.info(`Service: Successfully fell back to CACHE price for ${asset.coincapId}`)
+            } else {
+                logger.error(`Service: Failed to fetch current price and no CACHE available for ${asset.coincapId}`);
+                throw new AppError('Service Unavailable. CoinCap is down and no cached price exists.', httpStatus.SERVICE_UNAVAILABLE, { assetId: data.assetId });
+            }
         }
 
         const transactionData = {
@@ -52,7 +61,8 @@ export class TransactionService {
             type: data.type,
             quantity: data.quantity,
             notes: data.notes,
-            priceUsdAtExecution: price
+            priceUsdAtExecution: price,
+            priceSource: currentPriceSource
         };
 
         const createdTransaction = await this.transactionRepository.create(transactionData);
