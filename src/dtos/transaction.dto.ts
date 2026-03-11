@@ -7,6 +7,7 @@ export interface TransactionResponseDto {
     type: 'BUY' | 'SELL';
     quantity: number;
     priceUsdAtExecution: number;
+    priceSource: 'COINCAP' | 'CACHE';
     executedAt?: Date;
     notes?: string;
 }

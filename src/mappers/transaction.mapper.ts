@@ -8,6 +8,7 @@ export const toTransactionResponse = (transaction: ITransaction | ITransactionPo
     type: transaction.type,
     quantity: transaction.quantity,
     priceUsdAtExecution: transaction.priceUsdAtExecution,
+    priceSource: transaction.priceSource,
     executedAt: transaction.executedAt,
     notes: transaction.notes,
 });
