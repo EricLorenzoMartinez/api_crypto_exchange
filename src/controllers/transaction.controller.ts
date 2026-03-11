@@ -62,4 +62,28 @@ export class TransactionController {
             next(appError);
         }
     };
+
+    createTransaction = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const body = req.body as CreateTransactionDto;
+        logger.debug(`Controller: Received request to create transaction with body: ${JSON.stringify(body)}`);
+        try {
+            const userId = "<USER_ID>"; //TODO: Get from auth when done
+            const input = toCreateTransactionInput(body);
+            const transaction = await this.transactionService.createTransaction(userId, input);
+            const data = toTransactionResponse(transaction);
+
+            const response = {
+                message: 'Transaction created successfully',
+                data,
+            };
+            res.status(httpStatus.CREATED).send(response);
+        } catch (error) {
+            let appError = error as unknown;
+            logger.debug('Controller: Error creating transaction');
+            if (!(appError instanceof AppError)) {
+                appError = new AppError('Error occurred while creating transaction', httpStatus.INTERNAL_SERVER_ERROR, {originalError: appError});
+            }
+            next(appError);
+        }
+    };
 }
