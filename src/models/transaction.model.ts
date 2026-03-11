@@ -10,6 +10,7 @@ const transactionSchema = new mongoose.Schema(
         type: { type: String, enum: ['BUY', 'SELL'], required: true },
         quantity: { type: Number, required: true },
         priceUsdAtExecution: { type: Number, required: true },
+        priceSource: { type: String, enum: ['COINCAP', 'CACHE'], required: true },
         executedAt: { type: Date, required: false, default: Date.now },
         notes: { type: String, required: false }
     },
