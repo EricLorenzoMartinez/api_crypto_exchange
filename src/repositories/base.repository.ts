@@ -64,4 +64,15 @@ export abstract class BaseRepository<T, TModel extends Document> {
         logger.debug(`Repository: Updated ${this.entityName} with id: ${id}`);
         return this.transformId(doc);
     }
+
+    async delete(id: string): Promise<T | null> {
+        logger.debug(`Repository: Deleting ${this.entityName} with id: ${id}`);
+        const doc = await this.model.findByIdAndDelete(id);
+        if (!doc) {
+            logger.debug(`Repository: No ${this.entityName} found with id: ${id} to delete`);
+            return null;
+        }
+        logger.debug(`Repository: Deleted ${this.entityName} with id: ${id}`);
+        return this.transformId(doc);
+    }
 }

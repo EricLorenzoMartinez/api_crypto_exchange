@@ -6,25 +6,22 @@ import { httpStatus } from '../config/httpStatusCodes';
 import { CoinCapProvider } from '../providers/coincap.provider';
 
 export class AssetService {
-    private readonly repository: AssetRepository;
+    private readonly AssetRepository: AssetRepository;
     private readonly coincapProvider: CoinCapProvider;
 
     constructor() {
-        this.repository = new AssetRepository();
+        this.AssetRepository = new AssetRepository();
         this.coincapProvider = new CoinCapProvider();
     }
 
-    async getAllAssets(pagination: {
-        skip: number;
-        limit: number;
-    }): Promise<IAsset[]> {
+    async getAllAssets(pagination: { skip: number;limit: number; }): Promise<IAsset[]> {
         logger.debug(`Service: Getting all assets with pagination: ${JSON.stringify(pagination)}`);
-        return this.repository.getAll({}, pagination);
+        return this.AssetRepository.getAll({}, pagination);
     }
 
     async getAssetById(id: string): Promise<IAsset> {
         logger.debug(`Service: Getting asset by id: ${id}`);
-        const asset = await this.repository.getById(id);
+        const asset = await this.AssetRepository.getById(id);
         if (!asset) {
             logger.warn(`Asset with id ${id} not found`);
             throw new AppError(`Asset not found`, httpStatus.NOT_FOUND, { id });
@@ -32,13 +29,13 @@ export class AssetService {
         return asset;
     }
 
-    async createAsset(data: Partial<IAssetCreate>): Promise<IAsset> {
-        const existingAsset = await this.repository.getAll({ coincapId: data.coincapId });
-        if (existingAsset.length > 0) {
+    async createAsset(data: IAssetCreate): Promise<IAsset> {
+        const existingAsset = await this.AssetRepository.getAssetByCoinCapId(data.coincapId);
+        if (existingAsset) {
             logger.warn(`Asset with coincapId ${data.coincapId} already exists`);
             throw new AppError(`Asset already exists`, httpStatus.CONFLICT, { coincapId: data.coincapId });
         }
-        const createdAsset = await this.repository.create(data);
+        const createdAsset = await this.AssetRepository.create(data);
         if (!createdAsset) {
             logger.error(`Failed to create asset with data: ${JSON.stringify(data)}`);
             throw new AppError(`Failed to create asset`, httpStatus.INTERNAL_SERVER_ERROR);
@@ -62,7 +59,7 @@ export class AssetService {
             lastPriceAt: new Date(),
         };
 
-        const updatedAsset = await this.repository.update(id, updatedData);
+        const updatedAsset = await this.AssetRepository.update(id, updatedData);
         
         if (!updatedAsset) {
             logger.error(`Service: Failed to update asset with coincapId: ${asset.coincapId}`);
