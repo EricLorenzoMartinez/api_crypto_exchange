@@ -1,0 +1,43 @@
+name: Crypto API CI Pipeline
+
+# When do we want to run this pipeline?
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    # What operating system does the agent use?
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Agent downloads the repository code to work with it
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2. Agent installs pnpm to manage dependencies
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 8
+
+    # 3. Agent installs Node.js and tells it to cache pnpm for faster execution
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'pnpm'
+
+    # 4. Agent installs dependencies (the equivalent of pnpm i)
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+
+    # 5. Agent runs the linter (you have eslint.config.mjs)
+    - name: Run ESLint
+      run: pnpm run lint --if-present
+
+    # 6. Agent compiles TypeScript to JavaScript
+    - name: Build TypeScript
+      run: pnpm run build --if-present
