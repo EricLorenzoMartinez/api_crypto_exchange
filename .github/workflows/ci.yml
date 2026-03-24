@@ -36,8 +36,8 @@ jobs:
 
     # 5. Agent runs the linter (you have eslint.config.mjs)
     - name: Run ESLint
-      run: pnpm run lint --if-present
+      run: pnpm run lint
 
     # 6. Agent compiles TypeScript to JavaScript
     - name: Build TypeScript
-      run: pnpm run build --if-present
+      run: pnpm run build
