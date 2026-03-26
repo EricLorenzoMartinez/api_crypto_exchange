@@ -4,18 +4,18 @@ A REST API simulating a Cryptocurrency Exchange platform where users can manage 
 
 Built with a layered architecture (Controller-Service-Repository) to ensure a clear separation of concerns, scalability, and maintainability.
 
-## 🚀 Core Functionalities
+---
 
-* **JWT Authentication:** Secure route protection and user session management.
-* **Asset Catalog:** Full CRUD operations for digital assets with dynamic price refreshing.
-* **Transactions:** Real-time buy/sell management with price capturing at the exact moment of the transaction.
-* **Advanced Portfolio Aggregation:** Dynamic portfolio calculation using MongoDB Aggregation Pipelines (`$group`, `$lookup`, `$cond`).
-* **CoinCap API Integration:** Fetches live market prices from an external API.
-* **Cache Fallback System:** Implemented a reliable fallback mechanism that serves cached memory prices in case the external CoinCap API fails.
+## 🏗️ Infrastructure & CI/CD Pipeline
 
-## 🛠️ Development Highlights
+This project embraces modern DevOps practices for continuous integration and delivery:
+* **Fully Containerized:** Uses an optimized, multi-stage `Dockerfile` to separate the build environment from the lean production runtime.
+* **Automated CI/CD (GitHub Actions):** Every push triggers a workflow that automatically installs dependencies, runs the linter, compiles TypeScript, and—upon success—builds and pushes the final Docker image to Docker Hub.
 
-* Designed complex data aggregation pipelines for real-time analytics.
-* Utilized AI tools for Pair Programming, specifically to optimize Mongoose search queries and refine TypeScript/Express request typings.
+### 🐳 How to Run via Docker (Production Ready)
+You can pull the latest automated build directly from Docker Hub without needing to compile the code yourself:
 
-🎥 **[Watch the Video Demonstration](https://drive.google.com/file/d/1Wq3LYdQvkOeBV_a6x23l6bCZuS28qTKC/view?usp=sharing)**
+**1. Create your local environment file:**
+```bash
+cp .env.example .env
+# Edit .env with your real MongoDB Atlas URI and CoinCap API Key
